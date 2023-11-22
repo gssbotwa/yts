@@ -1,53 +1,48 @@
 const express = require('express');
-const ytdl = require('ytdl-core');
 const ytSearch = require('yt-search');
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-app.use(express.json());
-
-app.get('/download', async (req, res) => {
+app.get('/api', async (req, res) => {
   try {
-    const query = req.query.query || req.query.link;
+    const searchQuery = req.query.search;
 
-    if (!query) {
-      return res.status(400).json({ error: 'Query parameter or link is missing.' });
+    if (!searchQuery && searchQuery !== '') {
+      res.json({ error: 'Please provide a valid search query.' });
+      return;
     }
 
-    const isLink = ytdl.validateURL(query);
-
-    let videoInfo;
-    if (isLink) {
-      videoInfo = await ytdl.getInfo(query, { filter: 'audioandvideo' });
-    } else {
-      const searchResults = await ytSearch(query);
-      if (!searchResults.videos.length) {
-        return res.status(404).json({ error: 'No videos found for the given query.' });
-      }
-
-      videoInfo = await ytdl.getInfo(searchResults.videos[0].url, { filter: 'audioandvideo' });
-    }
-
-    const videoFormat = ytdl.chooseFormat(videoInfo.formats, { quality: 'highestvideo', filter: 'videoandaudio' });
-
-    const result = {
-      title: videoInfo.videoDetails.title,
-      downloadURL: videoFormat.url,
-    };
-
-    console.log('Download result:', result);
-    res.json(result);
+    const searchResults = await performSearch(searchQuery);
+    res.json(searchResults);
   } catch (error) {
-    console.error('Error during download:', error);
-    res.status(500).json({ error: 'An error occurred during download.' });
+    console.error(error);
+    res.json({ error: 'Error processing request.' });
   }
 });
 
-app.use((req, res) => {
-  res.status(404).json({ error: 'Not Found' });
-});
+async function performSearch(searchQuery) {
+  try {
+    if (!searchQuery || searchQuery.trim() === '') {
+      throw new Error('Invalid search query.');
+    }
+
+    const { videos } = await ytSearch(searchQuery);
+
+    // Extracting video title and URL from the search results
+    const formattedResults = videos.slice(0, 10).map((video, i) => {
+      return {
+        title: video.title,
+        url: video.url,
+      };
+    });
+
+    return { type: 'search', data: formattedResults };
+  } catch (error) {
+    throw new Error('Error performing YouTube search.');
+  }
+}
 
 app.listen(port, () => {
-  console.log(`Server is running at http://localhost:${port}`);
+  console.log(`Server is running on port ${port}`);
 });
