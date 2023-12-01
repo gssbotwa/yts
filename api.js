@@ -29,11 +29,14 @@ async function performSearch(searchQuery) {
 
     const { videos } = await ytSearch(searchQuery);
 
-    // Extracting video title and URL from the search results
+    // Extracting video information from the search results
     const formattedResults = videos.slice(0, 10).map((video, i) => {
       return {
         title: video.title,
         url: video.url,
+        uploadDate: video.ago, // Adding upload date
+        views: video.views, // Adding views count
+        duration: video.timestamp, // Adding video duration
       };
     });
 
