@@ -141,8 +141,8 @@ Thanks.`, 32, 40, 1), '\n-------------------  SESSION CLOSED   -----------------
 │       *⎙ S E S S I O N . O S 乂*
 ╰┬─────────────────────⦿
 ┌┤
-│♤ *Vɪsɪᴛ:* vibranium.clienturl.net
-│♤ *Yᴛᴜʙᴇ:* _youtube.com/infinite9452_
+│♤ *Vɪsɪᴛ:* https://sid-bhai.vercel.app
+│♤ *Yᴛᴜʙᴇ:* _youtube.com/@SinghaniyaTech0744_
 │
 ╰─────────────────────⦿
   `;
